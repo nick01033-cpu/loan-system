@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>活動物品借用系統</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/dist/tabler-icons.min.css">
+<style>
+  :root {
+    --blue: #185FA5; --blue-light: #E6F1FB; --blue-mid: #B5D4F4; --blue-dark: #0C447C;
+    --green: #3B6D11; --green-light: #EAF3DE; --green-mid: #C0DD97;
+    --amber: #854F0B; --amber-light: #FAEEDA; --amber-mid: #FAC775;
+    --red: #A32D2D; --red-light: #FCEBEB;
+    --gray: #5F5E5A; --gray-light: #F1EFE8; --gray-mid: #D3D1C7;
+    --text: #1a1a18; --text-secondary: #6b6a65; --text-hint: #9c9a92;
+    --bg: #ffffff; --bg-secondary: #f5f4f0; --bg-tertiary: #efede8;
+    --border: rgba(0,0,0,0.12); --border-strong: rgba(0,0,0,0.22);
+    --radius: 8px; --radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text: #e8e6df; --text-secondary: #9c9a92; --text-hint: #6b6a65;
+      --bg: #1c1c1a; --bg-secondary: #252523; --bg-tertiary: #2e2e2b;
+      --border: rgba(255,255,255,0.1); --border-strong: rgba(255,255,255,0.2);
+      --blue-light: #0c2a45; --blue-mid: #0c447c; --blue: #378ADD; --blue-dark: #85B7EB;
+      --green-light: #172904; --green-mid: #27500A; --green: #97C459;
+      --amber-light: #2a1800; --amber-mid: #633806; --amber: #EF9F27;
+      --red-light: #2a0a0a; --red: #F09595;
+      --gray-light: #252523; --gray-mid: #444441;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif; background: var(--bg-tertiary); color: var(--text); min-height: 100vh; }
+
+  /* NAV */
+  .nav { background: var(--bg); border-bottom: 0.5px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 10; }
+  .nav-title { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; color: var(--text); }
+  .nav-title i { color: var(--blue); font-size: 20px; }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab { padding: 6px 16px; font-size: 13px; border-radius: var(--radius); border: 0.5px solid transparent; cursor: pointer; color: var(--text-secondary); background: transparent; transition: all 0.15s; font-family: inherit; }
+  .nav-tab.active { background: var(--bg-secondary); border-color: var(--border); color: var(--text); font-weight: 500; }
+  .nav-tab:hover:not(.active) { background: var(--bg-secondary); }
+
+  /* LAYOUT */
+  .container { max-width: 860px; margin: 0 auto; padding: 28px 20px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* STEPS */
+  .steps-bar { display: flex; align-items: center; margin-bottom: 28px; }
+  .step-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-secondary); }
+  .step-item.active { color: var(--blue); font-weight: 500; }
+  .step-item.done { color: var(--green); }
+  .step-circle { width: 24px; height: 24px; border-radius: 50%; border: 0.5px solid var(--border-strong); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; background: var(--bg); flex-shrink: 0; }
+  .step-item.active .step-circle { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .step-item.done .step-circle { background: var(--green-light); color: var(--green); border-color: var(--green-mid); }
+  .step-line { flex: 1; height: 0.5px; background: var(--border); margin: 0 10px; }
+
+  /* SECTION */
+  .section-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .section-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+
+  /* ITEMS GRID */
+  .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .item-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; cursor: pointer; transition: border-color 0.15s; position: relative; user-select: none; }
+  .item-card:hover:not(.soldout) { border-color: var(--border-strong); }
+  .item-card.selected { border: 1.5px solid var(--blue); background: var(--blue-light); }
+  .item-card.soldout { opacity: 0.5; cursor: not-allowed; }
+  .check-badge { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 11px; display: none; align-items: center; justify-content: center; }
+  .item-card.selected .check-badge { display: flex; }
+  .loc-tag { font-size: 11px; color: var(--text-secondary); display: flex; align-items: center; gap: 3px; margin-bottom: 5px; }
+  .item-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .item-spec { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+  .item-footer { display: flex; align-items: center; justify-content: space-between; min-height: 26px; }
+  .avail-badge { font-size: 11px; padding: 3px 9px; border-radius: 99px; font-weight: 500; }
+  .av-ok { background: var(--green-light); color: var(--green); }
+  .av-low { background: var(--amber-light); color: var(--amber); }
+  .av-no { background: var(--red-light); color: var(--red); }
+  .qty-ctrl { display: none; align-items: center; gap: 7px; }
+  .item-card.selected .qty-ctrl { display: flex; }
+  .item-card.selected .avail-badge { display: none; }
+  .qty-btn { width: 24px; height: 24px; border-radius: 50%; border: 0.5px solid var(--blue-mid); background: var(--blue-light); color: var(--blue); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; font-family: inherit; transition: background 0.1s; }
+  .qty-btn:hover { background: var(--blue-mid); }
+  .qty-num { font-size: 14px; font-weight: 600; color: var(--blue); min-width: 18px; text-align: center; }
+
+  /* CART */
+  .cart-bar { background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 18px; margin-bottom: 20px; }
+  .cart-bar-title { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .cart-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .cart-chip { font-size: 12px; padding: 4px 10px; background: var(--bg); border: 0.5px solid var(--blue-mid); border-radius: 99px; color: var(--blue); display: flex; align-items: center; gap: 5px; }
+  .cart-chip .rm { cursor: pointer; color: var(--text-hint); font-size: 12px; line-height: 1; }
+  .cart-chip .rm:hover { color: var(--red); }
+  .cart-empty { font-size: 12px; color: var(--text-hint); font-style: italic; }
+
+  /* LOADING INDICATOR */
+  .loading-bar { display: none; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; padding: 10px 14px; background: var(--bg-secondary); border-radius: var(--radius); }
+  .loading-bar.show { display: flex; }
+  .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ORDER SUMMARY */
+  .order-summary { background: var(--blue-light); border: 0.5px solid var(--blue-mid); border-radius: var(--radius-lg); padding: 14px 18px; margin-bottom: 20px; }
+  .order-title { font-size: 12px; font-weight: 600; color: var(--blue-dark); margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+  .order-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--blue); padding: 4px 0; border-bottom: 0.5px solid var(--blue-mid); }
+  .order-row:last-child { border-bottom: none; }
+  .order-qty { font-size: 12px; background: var(--blue-mid); color: var(--blue-dark); padding: 1px 9px; border-radius: 99px; font-weight: 600; }
+
+  /* FORM */
+  .form-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 24px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+  .fg { display: flex; flex-direction: column; gap: 5px; }
+  .fg.full { grid-column: 1 / -1; }
+  .fg label { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+  .fg input, .fg select, .fg textarea { font-size: 14px; padding: 9px 12px; border-radius: var(--radius); border: 0.5px solid var(--border-strong); background: var(--bg); color: var(--text); font-family: inherit; transition: border-color 0.15s; outline: none; }
+  .fg input:focus, .fg select:focus, .fg textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(24,95,165,0.12); }
+  .fg textarea { resize: vertical; min-height: 70px; }
+  .form-divider { grid-column: 1 / -1; border: none; border-top: 0.5px solid var(--border); margin: 4px 0; }
+  .form-sec { grid-column: 1 / -1; font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.06em; text-transform: uppercase; padding-top: 4px; display: flex; align-items: center; gap: 5px; }
+
+  /* BUTTONS */
+  .btn-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 20px; }
+  .btn-primary { padding: 10px 22px; font-size: 14px; font-weight: 500; background: var(--blue); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; font-family: inherit; transition: background 0.15s; }
+  .btn-primary:hover { background: var(--blue-dark); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-secondary { padding: 9px 18px; font-size: 13px; color: var(--text-secondary); background: transparent; border: 0.5px solid var(--border-strong); border-radius: var(--radius); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; transition: background 0.15s; }
+  .btn-secondary:hover { background: var(--bg-secondary); }
+
+  /* SUCCESS */
+  .success-wrap { text-align: center; padding: 40px 20px; }
+  .success-icon { font-size: 48px; color: var(--green); margin-bottom: 14px; }
+  .success-title { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .success-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.7; }
+  .success-box { background: var(--green-light); border: 0.5px solid var(--green-mid); border-radius: var(--radius-lg); padding: 16px 20px; text-align: left; max-width: 440px; margin: 0 auto 24px; }
+  .success-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--green); padding: 4px 0; border-bottom: 0.5px solid var(--green-mid); }
+  .success-row:last-child { border-bottom: none; }
+
+  /* ADMIN */
+  .admin-setup { background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 24px; }
+  .setup-title { font-size: 14px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 7px; }
+  .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .setup-grid { grid-template-columns: 1fr; } }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot-ok { background: var(--green); }
+  .dot-pending { background: var(--amber); }
+  .notion-hint { font-size: 12px; color: var(--text-secondary); margin-top: 10px; line-height: 1.65; padding: 10px 14px; background: var(--bg); border-radius: var(--radius); border: 0.5px solid var(--border); }
+  .notion-hint code { font-family: monospace; font-size: 11px; background: var(--bg-secondary); padding: 1px 5px; border-radius: 3px; border: 0.5px solid var(--border); }
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 0.5px solid var(--border); }
+  .tab-btn { padding: 8px 16px; font-size: 13px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: inherit; transition: color 0.15s; }
+  .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 500; }
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+  @media (max-width: 600px) { .stats-row { grid-template-columns: repeat(2,1fr); } }
+  .stat-card { background: var(--bg-secondary); border-radius: var(--radius); padding: 14px 16px; }
+  .stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+  .stat-value { font-size: 24px; font-weight: 600; color: var(--text); }
+  .records-wrap { overflow-x: auto; }
+  .records-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px; }
+  .records-table th { font-weight: 500; font-size: 11px; color: var(--text-secondary); text-align: left; padding: 8px 12px; border-bottom: 0.5px solid var(--border); white-space: nowrap; }
+  .records-table td { padding: 10px 12px; border-bottom: 0.5px solid var(--border); color: var(--text); vertical-align: top; }
+  .records-table tr:last-child td { border-bottom: none; }
+  .pill { font-size: 11px; padding: 3px 9px; border-radius: 99px; font-weight: 500; white-space: nowrap; }
+  .pill-pending { background: var(--amber-light); color: var(--amber); }
+  .pill-active { background: var(--green-light); color: var(--green); }
+  .pill-returned { background: var(--bg-secondary); color: var(--text-secondary); }
+  .act-btn { font-size: 12px; padding: 4px 10px; border-radius: var(--radius); border: 0.5px solid var(--border-strong); background: transparent; color: var(--text-secondary); cursor: pointer; margin-right: 4px; font-family: inherit; }
+  .act-btn:hover { background: var(--bg-secondary); }
+  .act-btn.ok { border-color: var(--green-mid); color: var(--green); }
+  .act-btn.ok:hover { background: var(--green-light); }
+  .items-mgmt-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 0.5px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; background: var(--bg); }
+  .im-name { font-size: 14px; font-weight: 500; }
+  .im-meta { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .chips-cell { display: flex; flex-direction: column; gap: 3px; }
+  .chip-sm { font-size: 11px; background: var(--bg-secondary); border-radius: 3px; padding: 2px 6px; color: var(--text-secondary); display: inline-block; width: fit-content; }
+  .error-msg { background: var(--red-light); border: 0.5px solid #F7C1C1; border-radius: var(--radius); padding: 10px 14px; font-size: 13px; color: var(--red); margin-bottom: 14px; display: none; }
+  .error-msg.show { display: block; }
+  .tag-new { background: var(--amber-light); color: var(--amber); font-size: 11px; padding: 1px 7px; border-radius: 99px; font-weight: 500; margin-left: 6px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-title"><i class="ti ti-package"></i>活動物品借用系統</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('borrow',this)"><i class="ti ti-clipboard-list"></i> 借用申請</button>
+    <button class="nav-tab" onclick="showPage('admin',this)"><i class="ti ti-settings"></i> 管理後台</button>
+  </div>
+</nav>
+
+<!-- 借用申請 -->
+<div class="container">
+<div class="page active" id="page-borrow">
+
+  <!-- 步驟一：選擇物品 -->
+  <div id="step1">
+    <div class="steps-bar">
+      <div class="step-item active"><div class="step-circle">1</div>選擇物品</div>
+      <div class="step-line"></div>
+      <div class="step-item"><div class="step-circle">2</div>填寫資料</div>
+      <div class="step-line"></div>
+      <div class="step-item"><div class="step-circle">3</div>完成申請</div>
+    </div>
+    <div class="section-title">選擇欲借用的物品</div>
+    <div class="section-sub">可同時勾選多項，並調整各項數量</div>
+
+    <div class="loading-bar" id="load-items"><div class="spinner"></div>正在從 Notion 讀取物品資料...</div>
+    <div class="error-msg" id="err-items"></div>
+
+    <div class="items-grid" id="items-grid">
+      <!-- 物品卡片由 JS 動態產生 -->
+    </div>
+
+    <div class="cart-bar">
+      <div class="cart-bar-title"><i class="ti ti-shopping-cart"></i>已選物品</div>
+      <div class="cart-chips" id="cart-chips"><span class="cart-empty">尚未選擇任何物品</span></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep2()"><i class="ti ti-arrow-right"></i>下一步：填寫申請資料</button>
+    </div>
+  </div>
+
+  <!-- 步驟二：填寫資料 -->
+  <div id="step2" style="display:none;">
+    <div class="steps-bar">
+      <div class="step-item done"><div class="step-circle"><i class="ti ti-check" style="font-size:11px"></i></div>選擇物品</div>
+      <div class="step-line"></div>
+      <div class="step-item active"><div class="step-circle">2</div>填寫資料</div>
+      <div class="step-line"></div>
+      <div class="step-item"><div class="step-circle">3</div>完成申請</div>
+    </div>
+
+    <div class="order-summary" id="order-summary"></div>
+
+    <div class="form-card">
+      <div class="form-grid">
+        <div class="form-sec"><i class="ti ti-calendar"></i> 借用時間</div>
+        <div class="fg"><label>領取日期／時間 *</label><input type="datetime-local" id="f-pickup"></div>
+        <div class="fg"><label>歸還日期／時間 *</label><input type="datetime-local" id="f-return"></div>
+        <hr class="form-divider">
+        <div class="form-sec"><i class="ti ti-user"></i> 借用人資料</div>
+        <div class="fg"><label>借用單位 *</label><input type="text" id="f-unit" placeholder="請輸入單位名稱"></div>
+        <div class="fg"><label>借用人姓名 *</label><input type="text" id="f-name" placeholder="請輸入姓名"></div>
+        <div class="fg"><label>職稱</label><input type="text" id="f-role" placeholder="請輸入職稱"></div>
+        <div class="fg"><label>連絡電話 *</label><input type="tel" id="f-phone" placeholder="請輸入電話"></div>
+        <div class="fg full"><label>電子信箱 *</label><input type="email" id="f-email" placeholder="請輸入 Email"></div>
+        <div class="fg full"><label>備註</label><textarea id="f-note" placeholder="特殊需求或說明（選填）"></textarea></div>
+      </div>
+      <div class="error-msg" id="err-submit"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="backStep1()"><i class="ti ti-arrow-left"></i>返回修改物品</button>
+        <button class="btn-primary" id="btn-submit" onclick="submitForm()"><i class="ti ti-send"></i>送出借用申請</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 步驟三：完成 -->
+  <div id="step3" style="display:none;">
+    <div class="steps-bar">
+      <div class="step-item done"><div class="step-circle"><i class="ti ti-check" style="font-size:11px"></i></div>選擇物品</div>
+      <div class="step-line"></div>
+      <div class="step-item done"><div class="step-circle"><i class="ti ti-check" style="font-size:11px"></i></div>填寫資料</div>
+      <div class="step-line"></div>
+      <div class="step-item active"><div class="step-circle" style="background:var(--blue);color:#fff;border-color:var(--blue);"><i class="ti ti-check" style="font-size:11px"></i></div>完成申請</div>
+    </div>
+    <div class="success-wrap">
+      <div class="success-icon"><i class="ti ti-circle-check"></i></div>
+      <div class="success-title">申請已成功送出！</div>
+      <div class="success-sub">管理單位將盡速確認並與您聯繫<br>申請記錄已同步寫入 Notion 資料庫</div>
+      <div class="success-box" id="success-detail"></div>
+      <button class="btn-secondary" onclick="resetAll()"><i class="ti ti-plus"></i>再次申請</button>
+    </div>
+  </div>
+</div>
+
+<!-- 管理後台 -->
+<div class="page" id="page-admin">
+  <div class="admin-setup">
+    <div class="setup-title">
+      <i class="ti ti-brand-notion" style="font-size:16px;"></i>
+      Notion API 設定
+      <span class="status-dot dot-pending" id="conn-dot"></span>
+      <span style="font-size:12px;color:var(--text-secondary);" id="conn-status">尚未連線</span>
+    </div>
+    <div class="setup-grid">
+      <div class="fg"><label>Integration Token</label><input type="password" id="n-token" placeholder="secret_xxxxxxxxxx" oninput="saveConfig()"></div>
+      <div class="fg"><label>物品清單 Database ID</label><input type="text" id="n-items-db" placeholder="32碼英數字" oninput="saveConfig()"></div>
+      <div class="fg"><label>借用記錄 Database ID</label><input type="text" id="n-loans-db" placeholder="32碼英數字" oninput="saveConfig()"></div>
+    </div>
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn-primary" onclick="testConn()" style="padding:8px 18px;font-size:13px;"><i class="ti ti-plug"></i>測試並儲存連線</button>
+    </div>
+    <div class="notion-hint">
+      前往 <code>notion.so/my-integrations</code> 建立整合取得 Token；Database ID 為資料庫網址中 <code>notion.so/</code> 後方、<code>?v=</code> 前方的 32 碼字串。兩個資料庫均需在「⋯ → Connections」中加入此 Integration。
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('req',this)"><i class="ti ti-clipboard"></i> 借用申請
+      <span class="tag-new" id="pending-count">0</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('items',this)"><i class="ti ti-package"></i> 物品管理</button>
+  </div>
+
+  <div id="atab-req">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">待審核</div><div class="stat-value" id="s-pending" style="color:var(--amber);">—</div></div>
+      <div class="stat-card"><div class="stat-label">借出中</div><div class="stat-value" id="s-active" style="color:var(--blue);">—</div></div>
+      <div class="stat-card"><div class="stat-label">本月申請</div><div class="stat-value" id="s-month">—</div></div>
+      <div class="stat-card"><div class="stat-label">已歸還</div><div class="stat-value" id="s-returned" style="color:var(--green);">—</div></div>
+    </div>
+    <div class="loading-bar" id="load-records"><div class="spinner"></div>載入申請記錄中...</div>
+    <div class="records-wrap"><table class="records-table" id="records-table">
+      <thead><tr><th>申請人</th><th>借用物品</th><th>借用時間</th><th>狀態</th><th>操作</th></tr></thead>
+      <tbody id="records-body"><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-secondary);font-size:13px;">請先完成 Notion 連線設定</td></tr></tbody>
+    </table></div>
+  </div>
+
+  <div id="atab-items" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <span style="font-size:13px;color:var(--text-secondary);" id="items-count">—</span>
+      <button class="btn-secondary" onclick="loadItems(true)" style="font-size:12px;padding:6px 14px;"><i class="ti ti-refresh"></i>重新整理</button>
+    </div>
+    <div class="loading-bar" id="load-items2"><div class="spinner"></div>載入物品資料中...</div>
+    <div id="items-mgmt-list"><div style="text-align:center;padding:24px;color:var(--text-secondary);font-size:13px;">請先完成 Notion 連線設定</div></div>
+  </div>
+</div>
+</div>
+
+<script>
+const PROXY = 'https://api.allorigins.win/raw?url=';
+const NOTION_API = 'https://api.notion.com/v1';
+const NOTION_VER = '2022-06-28';
+
+let CONFIG = { token:'', itemsDb:'', loansDb:'' };
+let ITEMS = [];
+let selectedMap = {};
+
+window.onload = function(){
+  loadConfig();
+  if(CONFIG.token && CONFIG.itemsDb) loadItems(false);
+};
+
+function loadConfig(){
+  try {
+    const s = localStorage.getItem('loanConfig');
+    if(s){ CONFIG = JSON.parse(s); }
+    document.getElementById('n-token').value = CONFIG.token||'';
+    document.getElementById('n-items-db').value = CONFIG.itemsDb||'';
+    document.getElementById('n-loans-db').value = CONFIG.loansDb||'';
+    if(CONFIG.token){ setConnStatus(true); }
+  } catch(e){}
+}
+
+function saveConfig(){
+  CONFIG.token = document.getElementById('n-token').value.trim();
+  CONFIG.itemsDb = document.getElementById('n-items-db').value.trim();
+  CONFIG.loansDb = document.getElementById('n-loans-db').value.trim();
+  localStorage.setItem('loanConfig', JSON.stringify(CONFIG));
+}
+
+function setConnStatus(ok){
+  document.getElementById('conn-dot').className = 'status-dot ' + (ok ? 'dot-ok' : 'dot-pending');
+  document.getElementById('conn-status').textContent = ok ? '連線成功' : '尚未連線';
+  document.getElementById('conn-status').style.color = ok ? 'var(--green)' : 'var(--text-secondary)';
+}
+
+async function notionReq(path, method='GET', body=null){
+  const url = PROXY + encodeURIComponent(NOTION_API + path);
+  const opts = {
+    method,
+    headers: {
+      'Authorization': 'Bearer ' + CONFIG.token,
+      'Notion-Version': NOTION_VER,
+      'Content-Type': 'application/json'
+    }
+  };
+  if(body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+async function testConn(){
+  saveConfig();
+  if(!CONFIG.token || !CONFIG.itemsDb || !CONFIG.loansDb){
+    alert('請填寫所有 Notion 設定欄位'); return;
+  }
+  try {
+    await notionReq('/databases/' + CONFIG.itemsDb.replace(/-/g,''));
+    setConnStatus(true);
+    localStorage.setItem('loanConfig', JSON.stringify(CONFIG));
+    await loadItems(false);
+    await loadRecords();
+    alert('連線成功！');
+  } catch(e){
+    setConnStatus(false);
+    alert('連線失敗，請確認 Token 和 Database ID 是否正確，以及資料庫是否已加入 Integration。\n\n錯誤：' + e.message);
+  }
+}
+
+async function loadItems(showAdmin){
+  if(!CONFIG.token || !CONFIG.itemsDb) return;
+  const loadEl = showAdmin ? document.getElementById('load-items2') : document.getElementById('load-items');
+  if(loadEl) loadEl.classList.add('show');
+  try {
+    const data = await notionReq('/databases/' + CONFIG.itemsDb.replace(/-/g,'') + '/query', 'POST', { page_size: 100 });
+    ITEMS = data.results.map(p => {
+      const props = p.properties;
+      return {
+        id: p.id,
+        name: getPropText(props['物品名稱'] || props['Name'] || props['名稱']),
+        spec: getPropText(props['規格說明'] || props['規格'] || props['說明']),
+        total: getPropNum(props['總數量'] || props['數量']),
+        loaned: getPropNum(props['外借中數量'] || props['外借數量'] || props['借出']),
+        location: getPropSelect(props['存放位置'] || props['位置']),
+        note: getPropText(props['備註'])
+      };
+    }).filter(i => i.name);
+    renderItemsGrid();
+    if(showAdmin) renderItemsMgmt();
+  } catch(e){
+    showErr('err-items', '無法讀取物品資料：' + e.message);
+  } finally {
+    if(loadEl) loadEl.classList.remove('show');
+  }
+}
+
+function getPropText(prop){
+  if(!prop) return '';
+  if(prop.type==='title') return prop.title?.map(t=>t.plain_text).join('') || '';
+  if(prop.type==='rich_text') return prop.rich_text?.map(t=>t.plain_text).join('') || '';
+  return '';
+}
+function getPropNum(prop){
+  if(!prop) return 0;
+  return prop.number || 0;
+}
+function getPropSelect(prop){
+  if(!prop) return '';
+  return prop.select?.name || '';
+}
+
+function renderItemsGrid(){
+  const grid = document.getElementById('items-grid');
+  if(!ITEMS.length){
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-secondary);">Notion 物品清單尚無資料，請先在 Notion 新增物品。</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  ITEMS.forEach(item => {
+    const avail = item.total - item.loaned;
+    const soldout = avail <= 0;
+    const badgeCls = avail <= 0 ? 'av-no' : avail <= 2 ? 'av-low' : 'av-ok';
+    const badgeTxt = avail <= 0 ? '全數借出' : '可借 ' + avail + ' 件';
+    const card = document.createElement('div');
+    card.className = 'item-card' + (soldout?' soldout':'');
+    card.dataset.id = item.id;
+    card.dataset.name = item.name;
+    card.dataset.max = avail;
+    card.onclick = () => soldout ? alert('此物品目前全數借出') : toggleItem(card);
+    card.innerHTML = `
+      <div class="check-badge"><i class="ti ti-check" style="font-size:10px"></i></div>
+      ${item.location ? `<div class="loc-tag"><i class="ti ti-map-pin" style="font-size:11px"></i>${item.location}</div>` : ''}
+      <div class="item-name">${item.name}</div>
+      ${item.spec ? `<div class="item-spec">${item.spec}</div>` : '<div class="item-spec" style="min-height:18px;"></div>'}
+      <div class="item-footer">
+        <span class="avail-badge ${badgeCls}">${badgeTxt}</span>
+        <div class="qty-ctrl">
+          <button class="qty-btn" onclick="changeQty(event,this,-1)">−</button>
+          <span class="qty-num">1</span>
+          <button class="qty-btn" onclick="changeQty(event,this,1)">＋</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderItemsMgmt(){
+  const list = document.getElementById('items-mgmt-list');
+  document.getElementById('items-count').textContent = '共 ' + ITEMS.length + ' 項物品';
+  if(!ITEMS.length){ list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-secondary);">尚無物品資料</div>'; return; }
+  list.innerHTML = ITEMS.map(item => {
+    const avail = item.total - item.loaned;
+    return `<div class="items-mgmt-row">
+      <div>
+        <div class="im-name">${item.name}</div>
+        <div class="im-meta">${item.location ? item.location+'　｜　' : ''}總數 ${item.total}，外借 ${item.loaned}，可借 ${avail}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadRecords(){
+  if(!CONFIG.token || !CONFIG.loansDb) return;
+  document.getElementById('load-records').classList.add('show');
+  try {
+    const data = await notionReq('/databases/' + CONFIG.loansDb.replace(/-/g,'') + '/query', 'POST', {
+      sorts: [{ timestamp:'created_time', direction:'descending' }],
+      page_size: 50
+    });
+    renderRecords(data.results);
+  } catch(e){
+    document.getElementById('records-body').innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--red);font-size:13px;">讀取失敗：${e.message}</td></tr>`;
+  } finally {
+    document.getElementById('load-records').classList.remove('show');
+  }
+}
+
+function renderRecords(pages){
+  const tbody = document.getElementById('records-body');
+  let pending=0, active=0, returned=0;
+  const now = new Date(); const thisMonth = now.getMonth(); const thisYear = now.getFullYear();
+  let monthCount = 0;
+  if(!pages.length){ tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-secondary);">目前沒有借用記錄</td></tr>'; return; }
+  tbody.innerHTML = pages.map(p => {
+    const props = p.properties;
+    const name = getPropText(props['借用人姓名']||props['借用人']||props['姓名']);
+    const unit = getPropText(props['借用單位']||props['單位']);
+    const status = getPropSelect(props['借用狀態']||props['狀態']) || '待審核';
+    const items = getPropText(props['借用物品清單']||props['物品']||props['借用物品']);
+    const pickup = props['領取日期時間']?.date?.start || props['領取時間']?.date?.start || '';
+    const ret = props['歸還日期時間']?.date?.start || props['歸還時間']?.date?.start || '';
+    const created = new Date(p.created_time);
+    if(created.getMonth()===thisMonth && created.getFullYear()===thisYear) monthCount++;
+    if(status==='待審核') pending++;
+    else if(status==='借出中') active++;
+    else if(status==='已歸還') returned++;
+    const pillCls = status==='待審核'?'pill-pending':status==='借出中'?'pill-active':'pill-returned';
+    const fmtDate = d => d ? d.replace('T',' ').substring(0,16) : '—';
+    const actions = status==='待審核'
+      ? `<button class="act-btn ok" onclick="updateStatus('${p.id}','借出中',this)">核准</button><button class="act-btn" onclick="updateStatus('${p.id}','已拒絕',this)">拒絕</button>`
+      : status==='借出中'
+      ? `<button class="act-btn" onclick="updateStatus('${p.id}','已歸還',this)">標記歸還</button>`
+      : '';
+    return `<tr>
+      <td><div style="font-weight:500;">${name||'—'}</div><div style="font-size:11px;color:var(--text-secondary);">${unit||''}</div></td>
+      <td><div class="chips-cell">${(items||'').split('\n').filter(Boolean).map(i=>`<span class="chip-sm">${i}</span>`).join('') || `<span class="chip-sm">${items||'—'}</span>`}</div></td>
+      <td style="font-size:12px;white-space:nowrap;">${fmtDate(pickup)}<br><span style="color:var(--text-secondary);">→ ${fmtDate(ret)}</span></td>
+      <td><span class="pill ${pillCls}">${status}</span></td>
+      <td>${actions}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('s-pending').textContent = pending;
+  document.getElementById('s-active').textContent = active;
+  document.getElementById('s-month').textContent = monthCount;
+  document.getElementById('s-returned').textContent = returned;
+  document.getElementById('pending-count').textContent = pending;
+}
+
+async function updateStatus(pageId, newStatus, btn){
+  btn.disabled = true;
+  try {
+    await notionReq('/pages/' + pageId, 'PATCH', {
+      properties: { '借用狀態': { select: { name: newStatus } } }
+    });
+    await loadRecords();
+  } catch(e){ alert('更新失敗：' + e.message); btn.disabled = false; }
+}
+
+function toggleItem(card){
+  card.classList.toggle('selected');
+  const id = card.dataset.id;
+  if(card.classList.contains('selected')){ selectedMap[id] = { card, qty:1 }; }
+  else { delete selectedMap[id]; }
+  updateCart();
+}
+
+function changeQty(e, btn, delta){
+  e.stopPropagation();
+  const card = btn.closest('.item-card');
+  const numEl = card.querySelector('.qty-num');
+  const max = parseInt(card.dataset.max);
+  let v = parseInt(numEl.textContent) + delta;
+  if(v<1) v=1; if(v>max) v=max;
+  numEl.textContent = v;
+  if(selectedMap[card.dataset.id]) selectedMap[card.dataset.id].qty = v;
+  updateCart();
+}
+
+function updateCart(){
+  const container = document.getElementById('cart-chips');
+  const keys = Object.keys(selectedMap);
+  if(!keys.length){ container.innerHTML = '<span class="cart-empty">尚未選擇任何物品</span>'; return; }
+  container.innerHTML = keys.map(id => {
+    const {card, qty} = selectedMap[id];
+    const name = card.dataset.name;
+    return `<div class="cart-chip">${name} <strong>×${qty}</strong> <span class="rm" onclick="removeItem('${id}')">✕</span></div>`;
+  }).join('');
+}
+
+function removeItem(id){
+  if(selectedMap[id]){ selectedMap[id].card.classList.remove('selected'); delete selectedMap[id]; }
+  updateCart();
+}
+
+function goStep2(){
+  if(!Object.keys(selectedMap).length){ alert('請至少選擇一項物品'); return; }
+  const summary = document.getElementById('order-summary');
+  let html = '<div class="order-title"><i class="ti ti-shopping-cart"></i>本次借用清單</div>';
+  Object.values(selectedMap).forEach(({card, qty}) => {
+    const loc = card.querySelector('.loc-tag')?.textContent.trim() || '';
+    html += `<div class="order-row"><span>${card.dataset.name} <span style="font-size:11px;opacity:0.7;">${loc}</span></span><span class="order-qty">×${qty}</span></div>`;
+  });
+  summary.innerHTML = html;
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+}
+
+function backStep1(){ document.getElementById('step2').style.display='none'; document.getElementById('step1').style.display='block'; }
+
+async function submitForm(){
+  const reqs = [['f-pickup','領取日期時間'],['f-return','歸還日期時間'],['f-unit','借用單位'],['f-name','借用人姓名'],['f-phone','連絡電話'],['f-email','電子信箱']];
+  for(const [id,label] of reqs){ if(!document.getElementById(id).value){ alert('請填寫：'+label); return; } }
+  if(!CONFIG.token || !CONFIG.loansDb){ alert('請先在管理後台完成 Notion 連線設定'); return; }
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;"></div>送出中...';
+  const itemsList = Object.values(selectedMap).map(({card,qty}) => card.dataset.name + ' ×' + qty).join('\n');
+  const pickup = document.getElementById('f-pickup').value;
+  const ret = document.getElementById('f-return').value;
+  const props = {
+    '申請編號': { title: [{ text:{ content: 'R-' + Date.now().toString().slice(-6) } }] },
+    '借用物品清單': { rich_text: [{ text:{ content: itemsList } }] },
+    '領取日期時間': { date: { start: pickup } },
+    '歸還日期時間': { date: { start: ret } },
+    '借用單位': { rich_text: [{ text:{ content: document.getElementById('f-unit').value } }] },
+    '借用人姓名': { rich_text: [{ text:{ content: document.getElementById('f-name').value } }] },
+    '職稱': { rich_text: [{ text:{ content: document.getElementById('f-role').value } }] },
+    '連絡電話': { phone_number: document.getElementById('f-phone').value },
+    '電子信箱': { email: document.getElementById('f-email').value },
+    '備註': { rich_text: [{ text:{ content: document.getElementById('f-note').value } }] },
+    '借用狀態': { select: { name: '待審核' } }
+  };
+  try {
+    await notionReq('/pages', 'POST', { parent:{ database_id: CONFIG.loansDb.replace(/-/g,'') }, properties: props });
+    let detailHtml = Object.values(selectedMap).map(({card,qty}) =>
+      `<div class="success-row"><span>${card.dataset.name}</span><span>×${qty}</span></div>`).join('');
+    detailHtml += `<div class="success-row" style="border-top:0.5px solid var(--green-mid);margin-top:6px;padding-top:6px;"><span>借用單位</span><span>${document.getElementById('f-unit').value}</span></div>`;
+    detailHtml += `<div class="success-row"><span>借用人</span><span>${document.getElementById('f-name').value}</span></div>`;
+    detailHtml += `<div class="success-row"><span>領取時間</span><span>${pickup.replace('T',' ')}</span></div>`;
+    detailHtml += `<div class="success-row"><span>歸還時間</span><span>${ret.replace('T',' ')}</span></div>`;
+    document.getElementById('success-detail').innerHTML = detailHtml;
+    document.getElementById('step2').style.display='none';
+    document.getElementById('step3').style.display='block';
+  } catch(e){
+    showErr('err-submit','送出失敗：' + e.message);
+  } finally {
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-send"></i>送出借用申請';
+  }
+}
+
+function resetAll(){
+  Object.values(selectedMap).forEach(({card}) => card.classList.remove('selected'));
+  selectedMap = {};
+  document.querySelectorAll('.qty-num').forEach(n=>n.textContent='1');
+  ['f-pickup','f-return','f-unit','f-name','f-role','f-phone','f-email','f-note'].forEach(id=>document.getElementById(id).value='');
+  updateCart();
+  document.getElementById('step3').style.display='none';
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step1').style.display='block';
+}
+
+function showPage(p, btn){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  btn.classList.add('active');
+  if(p==='admin'){ loadRecords(); loadItems(true); }
+}
+
+function switchTab(tab, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('atab-req').style.display = tab==='req' ? '' : 'none';
+  document.getElementById('atab-items').style.display = tab==='items' ? '' : 'none';
+  if(tab==='items') loadItems(true);
+}
+
+function showErr(id, msg){ const el=document.getElementById(id); if(el){ el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),6000); } }
+</script>
+</body>
+</html>
