@@ -29,8 +29,6 @@
   .step-line{flex:1;height:0.5px;background:var(--border);margin:0 10px;}
   .section-title{font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px;}
   .section-sub{font-size:13px;color:var(--text-secondary);margin-bottom:20px;}
-
-  /* 物品卡片（含圖片版） */
   .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:20px;}
   .item-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;transition:border-color 0.15s;position:relative;user-select:none;overflow:hidden;}
   .item-card:hover:not(.soldout){border-color:var(--border-strong);}
@@ -61,7 +59,6 @@
   .qty-btn{width:26px;height:26px;border-radius:50%;border:0.5px solid var(--blue-mid);background:var(--blue-light);color:var(--blue);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;}
   .qty-btn:hover{background:var(--blue-mid);}
   .qty-num{font-size:14px;font-weight:600;color:var(--blue);min-width:18px;text-align:center;}
-
   .cart-bar{background:var(--bg-secondary);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:20px;}
   .cart-bar-title{font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
   .cart-chips{display:flex;flex-wrap:wrap;gap:7px;}
@@ -77,19 +74,33 @@
   .error-msg.show{display:block;}
   .btn-primary{padding:10px 22px;font-size:14px;font-weight:500;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:inherit;transition:background 0.15s;text-decoration:none;}
   .btn-primary:hover{background:var(--blue-dark);}
+  .btn-primary:disabled{opacity:0.6;cursor:not-allowed;}
   .btn-secondary{padding:9px 18px;font-size:13px;color:var(--text-secondary);background:transparent;border:0.5px solid var(--border-strong);border-radius:var(--radius);cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit;text-decoration:none;}
   .btn-secondary:hover{background:var(--bg-secondary);}
   .btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:20px;}
-  .form-box{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:28px 24px;text-align:center;}
-  .form-icon{font-size:40px;color:var(--blue);margin-bottom:14px;}
-  .form-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px;}
-  .form-sub{font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:20px;}
-  .items-list-box{background:var(--bg-secondary);border-radius:var(--radius);padding:12px 16px;margin-bottom:16px;text-align:left;}
-  .item-list-row{display:flex;justify-content:space-between;font-size:13px;color:var(--text);padding:4px 0;border-bottom:0.5px solid var(--border);}
-  .item-list-row:last-child{border-bottom:none;}
-  .copy-box{background:var(--blue-light);border:0.5px solid var(--blue-mid);border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;text-align:left;}
-  .copy-label{font-size:11px;font-weight:600;color:var(--blue-dark);margin-bottom:6px;}
-  .copy-text{font-family:monospace;font-size:12px;color:var(--blue);word-break:break-all;white-space:pre-wrap;line-height:1.6;}
+  .order-summary{background:var(--blue-light);border:0.5px solid var(--blue-mid);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:20px;}
+  .order-title{font-size:12px;font-weight:600;color:var(--blue-dark);margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+  .order-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--blue);padding:4px 0;border-bottom:0.5px solid var(--blue-mid);}
+  .order-row:last-child{border-bottom:none;}
+  .order-qty{font-size:12px;background:var(--blue-mid);color:var(--blue-dark);padding:1px 9px;border-radius:99px;font-weight:600;}
+  .form-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:24px;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:600px){.form-grid{grid-template-columns:1fr;}}
+  .fg{display:flex;flex-direction:column;gap:5px;}
+  .fg.full{grid-column:1/-1;}
+  .fg label{font-size:12px;font-weight:500;color:var(--text-secondary);}
+  .fg input,.fg select,.fg textarea{font-size:14px;padding:9px 12px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:var(--bg);color:var(--text);font-family:inherit;transition:border-color 0.15s;outline:none;}
+  .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,0.1);}
+  .fg textarea{resize:vertical;min-height:70px;}
+  .form-divider{grid-column:1/-1;border:none;border-top:0.5px solid var(--border);margin:4px 0;}
+  .form-sec{grid-column:1/-1;font-size:11px;font-weight:600;color:var(--text-secondary);letter-spacing:0.05em;text-transform:uppercase;padding-top:4px;display:flex;align-items:center;gap:5px;}
+  .success-wrap{text-align:center;padding:48px 20px;}
+  .success-icon{font-size:52px;color:var(--green);margin-bottom:16px;}
+  .success-title{font-size:20px;font-weight:600;color:var(--text);margin-bottom:8px;}
+  .success-sub{font-size:14px;color:var(--text-secondary);margin-bottom:28px;line-height:1.7;}
+  .success-box{background:var(--green-light);border:0.5px solid var(--green-mid);border-radius:var(--radius-lg);padding:16px 20px;text-align:left;max-width:460px;margin:0 auto 24px;}
+  .success-row{display:flex;justify-content:space-between;font-size:13px;color:var(--green);padding:4px 0;border-bottom:0.5px solid var(--green-mid);}
+  .success-row:last-child{border-bottom:none;}
   .admin-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px;transition:border-color 0.15s;text-decoration:none;display:block;}
   .admin-card:hover{border-color:var(--border-strong);}
   .setup-input{width:100%;font-size:13px;padding:8px 12px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:var(--bg);color:var(--text);font-family:inherit;margin-top:4px;}
@@ -107,20 +118,19 @@
 </nav>
 
 <div class="container">
-
-<!-- 借用申請 -->
 <div class="page active" id="page-borrow">
 
+  <!-- 步驟一：選擇物品 -->
   <div id="step1">
     <div class="steps-bar">
       <div class="step-item active"><div class="step-circle">1</div>選擇物品</div>
       <div class="step-line"></div>
-      <div class="step-item"><div class="step-circle">2</div>前往填表</div>
+      <div class="step-item"><div class="step-circle">2</div>填寫資料</div>
       <div class="step-line"></div>
       <div class="step-item"><div class="step-circle">3</div>完成申請</div>
     </div>
     <div class="section-title">選擇欲借用的物品</div>
-    <div class="section-sub">可同時勾選多項並調整數量，選好後點下一步前往 Notion 申請表單</div>
+    <div class="section-sub">可同時勾選多項並調整數量</div>
     <div class="loading-bar show" id="load-items"><div class="spinner"></div>正在讀取物品資料...</div>
     <div class="error-msg" id="err-items"></div>
     <div class="items-grid" id="items-grid"></div>
@@ -129,34 +139,83 @@
       <div class="cart-chips" id="cart-chips"><span class="cart-empty">尚未選擇任何物品</span></div>
     </div>
     <div class="btn-row">
-      <button class="btn-primary" onclick="goStep2()"><i class="ti ti-arrow-right"></i>下一步：前往填寫申請資料</button>
+      <button class="btn-primary" onclick="goStep2()"><i class="ti ti-arrow-right"></i>下一步：填寫申請資料</button>
     </div>
   </div>
 
+  <!-- 步驟二：填寫資料 -->
   <div id="step2" style="display:none;">
     <div class="steps-bar">
       <div class="step-item done"><div class="step-circle"><i class="ti ti-check" style="font-size:11px"></i></div>選擇物品</div>
       <div class="step-line"></div>
-      <div class="step-item active"><div class="step-circle">2</div>前往填表</div>
+      <div class="step-item active"><div class="step-circle">2</div>填寫資料</div>
       <div class="step-line"></div>
       <div class="step-item"><div class="step-circle">3</div>完成申請</div>
     </div>
-    <div class="form-box">
-      <div class="form-icon"><i class="ti ti-clipboard-text"></i></div>
-      <div class="form-title">確認借用清單，前往填寫申請表單</div>
-      <div class="form-sub">請先複製下方物品清單，再點「前往填寫申請表單」<br>在表單的「借用物品清單」欄位貼上即可</div>
-      <div class="items-list-box" id="items-list-box"></div>
-      <div class="copy-box">
-        <div class="copy-label"><i class="ti ti-copy" style="font-size:12px;margin-right:4px"></i>請複製此內容，貼到表單「借用物品清單」欄位</div>
-        <div class="copy-text" id="copy-text"></div>
+
+    <div class="order-summary" id="order-summary"></div>
+
+    <div class="form-card">
+      <div class="form-grid">
+        <div class="form-sec"><i class="ti ti-calendar"></i> 借用時間</div>
+        <div class="fg">
+          <label>領取日期／時間 *</label>
+          <input type="datetime-local" id="f-pickup">
+        </div>
+        <div class="fg">
+          <label>歸還日期／時間 *</label>
+          <input type="datetime-local" id="f-return">
+        </div>
+        <hr class="form-divider">
+        <div class="form-sec"><i class="ti ti-user"></i> 借用人資料</div>
+        <div class="fg">
+          <label>借用單位 *</label>
+          <input type="text" id="f-unit" placeholder="請輸入單位名稱">
+        </div>
+        <div class="fg">
+          <label>借用人姓名 *</label>
+          <input type="text" id="f-name" placeholder="請輸入姓名">
+        </div>
+        <div class="fg">
+          <label>職稱</label>
+          <input type="text" id="f-role" placeholder="請輸入職稱">
+        </div>
+        <div class="fg">
+          <label>連絡電話 *</label>
+          <input type="tel" id="f-phone" placeholder="請輸入電話">
+        </div>
+        <div class="fg full">
+          <label>電子信箱 *</label>
+          <input type="email" id="f-email" placeholder="請輸入 Email">
+        </div>
+        <div class="fg full">
+          <label>備註</label>
+          <textarea id="f-note" placeholder="特殊需求或說明（選填）"></textarea>
+        </div>
       </div>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn-secondary" onclick="copyList()"><i class="ti ti-copy"></i>複製物品清單</button>
-        <a class="btn-primary" href="https://www.notion.so/3607b4b0cbb78044bff4e2f5abae1900?v=3607b4b0cbb780af9ef9000c6ef07912&source=copy_link" target="_blank"><i class="ti ti-external-link"></i>前往填寫申請表單</a>
+      <div class="error-msg" id="err-submit"></div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="backStep1()"><i class="ti ti-arrow-left"></i>返回修改物品</button>
+        <button class="btn-primary" id="btn-submit" onclick="submitForm()"><i class="ti ti-send"></i>送出借用申請</button>
       </div>
-      <div style="margin-top:14px;">
-        <button class="btn-secondary" style="font-size:12px;" onclick="backStep1()"><i class="ti ti-arrow-left"></i>返回修改物品</button>
-      </div>
+    </div>
+  </div>
+
+  <!-- 步驟三：完成 -->
+  <div id="step3" style="display:none;">
+    <div class="steps-bar">
+      <div class="step-item done"><div class="step-circle"><i class="ti ti-check" style="font-size:11px"></i></div>選擇物品</div>
+      <div class="step-line"></div>
+      <div class="step-item done"><div class="step-circle"><i class="ti ti-check" style="font-size:11px"></i></div>填寫資料</div>
+      <div class="step-line"></div>
+      <div class="step-item active"><div class="step-circle" style="background:var(--blue);color:#fff;border-color:var(--blue);"><i class="ti ti-check" style="font-size:11px"></i></div>完成申請</div>
+    </div>
+    <div class="success-wrap">
+      <div class="success-icon"><i class="ti ti-circle-check"></i></div>
+      <div class="success-title">申請已成功送出！</div>
+      <div class="success-sub">管理單位將盡速確認並與您聯繫<br>申請記錄已同步寫入 Notion 資料庫</div>
+      <div class="success-box" id="success-detail"></div>
+      <button class="btn-secondary" onclick="resetAll()"><i class="ti ti-plus"></i>再次申請</button>
     </div>
   </div>
 
@@ -165,45 +224,21 @@
 <!-- 管理後台 -->
 <div class="page" id="page-admin">
   <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
-    <div style="font-size:15px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
-      <i class="ti ti-plug" style="color:var(--blue)"></i>Notion 連線設定
-    </div>
-    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;">設定後系統會自動從 Notion 讀取物品清單與圖片</div>
+    <div style="font-size:15px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px;"><i class="ti ti-plug" style="color:var(--blue)"></i>Notion 連線設定</div>
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;">設定後系統自動從 Notion 讀取物品清單，借用申請也會直接寫入 Notion</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-      <div>
-        <div style="font-size:12px;font-weight:500;color:var(--text-secondary);">Integration Token</div>
-        <input class="setup-input" type="password" id="cfg-token" placeholder="secret_xxxxxxxxxx">
-      </div>
-      <div>
-        <div style="font-size:12px;font-weight:500;color:var(--text-secondary);">物品清單 Database ID</div>
-        <input class="setup-input" type="text" id="cfg-db" placeholder="32碼英數字">
-      </div>
+      <div><div style="font-size:12px;font-weight:500;color:var(--text-secondary);">Integration Token</div><input class="setup-input" type="password" id="cfg-token" placeholder="secret_xxxxxxxxxx"></div>
+      <div><div style="font-size:12px;font-weight:500;color:var(--text-secondary);">物品清單 Database ID</div><input class="setup-input" type="text" id="cfg-db" placeholder="32碼英數字"></div>
     </div>
-    <button class="btn-primary" style="font-size:13px;padding:8px 18px;" onclick="saveAndLoad()">
-      <i class="ti ti-plug"></i>儲存並讀取物品清單
-    </button>
-    <div style="margin-top:10px;font-size:11px;color:var(--text-secondary);line-height:1.6;">
-      Token 從 <code style="background:var(--bg-secondary);padding:1px 5px;border-radius:3px;font-size:11px;">notion.so/my-integrations</code> 取得；Database ID 為物品清單頁面網址中的 32 碼字串
-    </div>
-  </div>
-
-  <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:16px;">
-    <div style="font-size:14px;font-weight:500;margin-bottom:6px;display:flex;align-items:center;gap:7px;">
-      <i class="ti ti-photo" style="color:var(--blue)"></i>圖片設定說明
-    </div>
-    <div style="font-size:12px;color:var(--text-secondary);line-height:1.8;">
-      1. 在 GitHub repository 建立 <code style="background:var(--bg-secondary);padding:1px 5px;border-radius:3px;">images/</code> 資料夾，上傳物品圖片<br>
-      2. 在 Notion「物品清單」新增欄位：名稱 <code style="background:var(--bg-secondary);padding:1px 5px;border-radius:3px;">圖片檔名</code>，類型 <strong>Text</strong><br>
-      3. 每項物品填入圖片檔名，例如 <code style="background:var(--bg-secondary);padding:1px 5px;border-radius:3px;">chair.jpg</code>、<code style="background:var(--bg-secondary);padding:1px 5px;border-radius:3px;">table.jpg</code><br>
-      4. 沒有填圖片檔名的物品會顯示預設圖示
-    </div>
+    <button class="btn-primary" style="font-size:13px;padding:8px 18px;" onclick="saveAndLoad()"><i class="ti ti-plug"></i>儲存並讀取物品清單</button>
+    <div style="margin-top:10px;font-size:11px;color:var(--text-secondary);line-height:1.6;">Token 從 <code style="background:var(--bg-secondary);padding:1px 5px;border-radius:3px;font-size:11px;">notion.so/my-integrations</code> 取得；Database ID 為物品清單頁面網址中的 32 碼字串</div>
   </div>
 
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
     <a class="admin-card" href="https://www.notion.so/3607b4b0cbb7808db422e536da1f6fad" target="_blank">
       <div style="font-size:20px;color:var(--blue);margin-bottom:8px;"><i class="ti ti-package"></i></div>
       <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">物品清單</div>
-      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">新增、編輯物品資料與圖片檔名</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">新增、編輯物品資料與庫存數量</div>
       <div style="font-size:12px;color:var(--blue);display:flex;align-items:center;gap:4px;">開啟 Notion <i class="ti ti-external-link" style="font-size:12px"></i></div>
     </a>
     <a class="admin-card" href="https://www.notion.so/3607b4b0cbb78044bff4e2f5abae1900?v=3607b4b0cbb780af9ef9000c6ef07912" target="_blank">
@@ -216,34 +251,32 @@
 
   <div style="background:var(--amber-light);border:0.5px solid var(--amber-mid);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--amber);display:flex;gap:7px;align-items:flex-start;line-height:1.6;">
     <i class="ti ti-bulb" style="font-size:14px;flex-shrink:0;margin-top:1px"></i>
-    <div>在 Notion 更新資料後，回到這裡點「儲存並讀取」即可刷新前台顯示。</div>
+    <div>借用者送出申請後，記錄會直接寫入「借用記錄」資料庫，狀態預設為「待審核」。請在 Notion 更改狀態為「借出中」表示核准，歸還後改為「已歸還」。</div>
   </div>
 </div>
-
 </div>
 
 <script>
 const WORKER = 'https://notion-proxy.nick01033.workers.dev';
+const ITEMS_DB = '3607b4b0cbb7808db422e536da1f6fad';
+const LOANS_DB = '3607b4b0cbb78044bff4e2f5abae1900';
 const IMAGES_BASE = 'https://nick01033-cpu.github.io/loan-system/images/';
-const FORM_URL = 'https://www.notion.so/3607b4b0cbb78044bff4e2f5abae1900?v=3607b4b0cbb780af9ef9000c6ef07912&source=copy_link';
 
 let ITEMS = [], selectedMap = {};
 
 window.onload = function(){
   const cfg = loadConfig();
-  if(cfg.token && cfg.db){
+  if(cfg.token){
     document.getElementById('cfg-token').value = cfg.token;
-    document.getElementById('cfg-db').value = cfg.db;
-    loadItems(cfg.token, cfg.db);
+    document.getElementById('cfg-db').value = cfg.db || ITEMS_DB;
+    loadItems(cfg.token, cfg.db || ITEMS_DB);
   } else {
     document.getElementById('load-items').classList.remove('show');
-    document.getElementById('items-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-secondary);font-size:13px;">請先到「管理後台」填入 Notion Token 和 Database ID</div>';
+    document.getElementById('items-grid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--text-secondary);font-size:13px;">請先到「管理後台」填入 Notion Token</div>';
   }
 };
 
-function loadConfig(){
-  try{ return JSON.parse(localStorage.getItem('notionCfg')||'{}'); }catch(e){ return {}; }
-}
+function loadConfig(){ try{ return JSON.parse(localStorage.getItem('notionCfg')||'{}'); }catch(e){ return {}; } }
 
 async function loadItems(token, dbId){
   const loadEl = document.getElementById('load-items');
@@ -253,36 +286,23 @@ async function loadItems(token, dbId){
   document.getElementById('items-grid').innerHTML = '';
   try {
     const res = await fetch(`${WORKER}/v1/databases/${dbId.replace(/-/g,'')}/query`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token,
-      },
-      body: JSON.stringify({ page_size: 100 })
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({page_size:100})
     });
-    if(!res.ok) throw new Error('HTTP ' + res.status + '，請確認 Token 和 Database ID 是否正確');
+    if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
-    if(data.object === 'error') throw new Error(data.message);
-    ITEMS = (data.results||[]).map(p => {
+    if(data.object==='error') throw new Error(data.message);
+    ITEMS = (data.results||[]).map(p=>{
       const pr = p.properties||{};
-      return {
-        id: p.id,
-        name: getT(pr['物品名稱']),
-        spec: getT(pr['規格說明']),
-        total: getN(pr['總數量']),
-        loaned: getN(pr['外借中數量']),
-        loc: getS(pr['存放位置']),
-        img: getT(pr['圖片檔名'])
-      };
-    }).filter(i => i.name);
-    if(!ITEMS.length) throw new Error('物品清單沒有資料，請先在 Notion 新增物品');
+      return { id:p.id, name:getT(pr['物品名稱']), spec:getT(pr['規格說明']), total:getN(pr['總數量']), loaned:getN(pr['外借中數量']), loc:getS(pr['存放位置']), img:getT(pr['圖片檔名']) };
+    }).filter(i=>i.name);
+    if(!ITEMS.length) throw new Error('物品清單沒有資料');
     renderGrid();
   } catch(e) {
-    errEl.innerHTML = '<strong>讀取失敗：</strong>' + e.message;
+    errEl.innerHTML = '<strong>讀取失敗：</strong>'+e.message;
     errEl.classList.add('show');
-  } finally {
-    loadEl.classList.remove('show');
-  }
+  } finally { loadEl.classList.remove('show'); }
 }
 
 function getT(p){ if(!p) return ''; return (p.title||p.rich_text||[]).map(t=>t.plain_text).join(''); }
@@ -292,23 +312,19 @@ function getS(p){ return p?.select?.name||''; }
 function renderGrid(){
   const g = document.getElementById('items-grid');
   g.innerHTML = '';
-  ITEMS.forEach((item, idx) => {
+  ITEMS.forEach((item,idx)=>{
     const avail = item.total - item.loaned;
-    const soldout = avail <= 0;
+    const soldout = avail<=0;
     const cls = avail<=0?'av-no':avail<=2?'av-low':'av-ok';
     const txt = avail<=0?'全數借出':'可借 '+avail+' 件';
-
     const imgHtml = item.img
       ? `<div class="item-img-wrap"><img class="item-img" src="${IMAGES_BASE}${encodeURIComponent(item.img)}" alt="${item.name}" onerror="this.closest('.item-img-wrap').innerHTML='<div class=\\'item-img-placeholder\\'><i class=\\'ti ti-package\\'></i></div>'"></div>`
       : `<div class="item-img-placeholder"><i class="ti ti-package"></i></div>`;
-
     const c = document.createElement('div');
-    c.className = 'item-card' + (soldout?' soldout':'');
-    c.dataset.idx = idx; c.dataset.name = item.name; c.dataset.max = avail;
-    c.onclick = () => soldout ? alert('此物品目前全數借出') : toggleItem(c);
-    c.innerHTML = `
-      ${imgHtml}
-      <div class="item-img-overlay"></div>
+    c.className = 'item-card'+(soldout?' soldout':'');
+    c.dataset.idx=idx; c.dataset.name=item.name; c.dataset.max=avail;
+    c.onclick = ()=> soldout ? alert('此物品目前全數借出') : toggleItem(c);
+    c.innerHTML = `${imgHtml}<div class="item-img-overlay"></div>
       <div class="check-badge"><i class="ti ti-check" style="font-size:11px"></i></div>
       <div class="soldout-overlay"><span class="soldout-label">全數借出</span></div>
       <div class="item-body">
@@ -330,56 +346,117 @@ function renderGrid(){
 
 function saveAndLoad(){
   const token = document.getElementById('cfg-token').value.trim();
-  const db = document.getElementById('cfg-db').value.trim();
-  if(!token || !db){ alert('請填寫 Token 和 Database ID'); return; }
+  const db = document.getElementById('cfg-db').value.trim() || ITEMS_DB;
+  if(!token){ alert('請填寫 Token'); return; }
   localStorage.setItem('notionCfg', JSON.stringify({token, db}));
-  selectedMap = {};
+  selectedMap={};
   loadItems(token, db);
   alert('設定已儲存！正在讀取物品資料...');
 }
 
 function toggleItem(c){
   c.classList.toggle('selected');
-  const idx = c.dataset.idx;
-  if(c.classList.contains('selected')) selectedMap[idx] = {card:c, qty:1};
+  const idx=c.dataset.idx;
+  if(c.classList.contains('selected')) selectedMap[idx]={card:c,qty:1};
   else delete selectedMap[idx];
   updateCart();
 }
 function chgQty(e,btn,d){
   e.stopPropagation();
-  const c = btn.closest('.item-card'), el = c.querySelector('.qty-num');
-  let v = Math.max(1, Math.min(parseInt(c.dataset.max), parseInt(el.textContent)+d));
-  el.textContent = v;
-  if(selectedMap[c.dataset.idx]) selectedMap[c.dataset.idx].qty = v;
+  const c=btn.closest('.item-card'), el=c.querySelector('.qty-num');
+  let v=Math.max(1,Math.min(parseInt(c.dataset.max),parseInt(el.textContent)+d));
+  el.textContent=v;
+  if(selectedMap[c.dataset.idx]) selectedMap[c.dataset.idx].qty=v;
   updateCart();
 }
 function updateCart(){
-  const el = document.getElementById('cart-chips'), keys = Object.keys(selectedMap);
-  if(!keys.length){ el.innerHTML='<span class="cart-empty">尚未選擇任何物品</span>'; return; }
-  el.innerHTML = keys.map(idx => {
-    const {card,qty} = selectedMap[idx];
-    return `<div class="cart-chip">${card.dataset.name} <strong>×${qty}</strong> <span class="rm" onclick="removeFromCart('${idx}')">✕</span></div>`;
-  }).join('');
+  const el=document.getElementById('cart-chips'), keys=Object.keys(selectedMap);
+  if(!keys.length){el.innerHTML='<span class="cart-empty">尚未選擇任何物品</span>';return;}
+  el.innerHTML=keys.map(idx=>{const{card,qty}=selectedMap[idx];return`<div class="cart-chip">${card.dataset.name} <strong>×${qty}</strong> <span class="rm" onclick="removeFromCart('${idx}')">✕</span></div>`;}).join('');
 }
 function removeFromCart(idx){ if(selectedMap[idx]){selectedMap[idx].card.classList.remove('selected');delete selectedMap[idx];} updateCart(); }
 
 function goStep2(){
-  const keys = Object.keys(selectedMap);
-  if(!keys.length){ alert('請至少選擇一項物品'); return; }
-  const lines = keys.map(idx => { const {card,qty} = selectedMap[idx]; return `${card.dataset.name} ×${qty}`; });
-  document.getElementById('items-list-box').innerHTML = lines.map(l => {
-    const p = l.lastIndexOf(' ×');
-    return `<div class="item-list-row"><span>${l.substring(0,p)}</span><span style="font-weight:600;color:var(--blue);">×${l.substring(p+2)}</span></div>`;
-  }).join('');
-  document.getElementById('copy-text').textContent = lines.join('\n');
-  document.getElementById('step1').style.display = 'none';
-  document.getElementById('step2').style.display = 'block';
+  const keys=Object.keys(selectedMap);
+  if(!keys.length){alert('請至少選擇一項物品');return;}
+  const summary = document.getElementById('order-summary');
+  let html='<div class="order-title"><i class="ti ti-shopping-cart"></i>本次借用清單</div>';
+  keys.forEach(idx=>{
+    const{card,qty}=selectedMap[idx];
+    const loc=card.querySelector('.loc-tag')?.textContent.trim()||'';
+    html+=`<div class="order-row"><span>${card.dataset.name} <span style="font-size:11px;opacity:0.7;">${loc}</span></span><span class="order-qty">×${qty}</span></div>`;
+  });
+  summary.innerHTML=html;
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function backStep1(){ document.getElementById('step2').style.display='none'; document.getElementById('step1').style.display='block'; }
-function copyList(){
-  const text = document.getElementById('copy-text').textContent;
-  navigator.clipboard.writeText(text).then(()=>alert('已複製！請貼到表單的「借用物品清單」欄位。')).catch(()=>prompt('請手動複製：',text));
+
+async function submitForm(){
+  const reqs=[['f-pickup','領取日期時間'],['f-return','歸還日期時間'],['f-unit','借用單位'],['f-name','借用人姓名'],['f-phone','連絡電話'],['f-email','電子信箱']];
+  for(const[id,label] of reqs){ if(!document.getElementById(id).value){alert('請填寫：'+label);return;} }
+  const cfg=loadConfig();
+  if(!cfg.token){alert('請先在管理後台填入 Notion Token');return;}
+  const btn=document.getElementById('btn-submit');
+  btn.disabled=true; btn.innerHTML='<div class="spinner" style="width:14px;height:14px;border-width:2px;"></div>送出中...';
+  const errEl=document.getElementById('err-submit');
+  errEl.classList.remove('show');
+  const keys=Object.keys(selectedMap);
+  const itemsList=keys.map(idx=>{const{card,qty}=selectedMap[idx];return`${card.dataset.name} ×${qty}`;}).join('\n');
+  const pickup=document.getElementById('f-pickup').value;
+  const ret=document.getElementById('f-return').value;
+  const props={
+    '申請編號':{title:[{text:{content:'R-'+Date.now().toString().slice(-6)}}]},
+    '借用物品清單':{rich_text:[{text:{content:itemsList}}]},
+    '領取日期時間':{date:{start:pickup}},
+    '歸還日期時間':{date:{start:ret}},
+    '借用單位':{rich_text:[{text:{content:document.getElementById('f-unit').value}}]},
+    '借用人姓名':{rich_text:[{text:{content:document.getElementById('f-name').value}}]},
+    '職稱':{rich_text:[{text:{content:document.getElementById('f-role').value}}]},
+    '連絡電話':{phone_number:document.getElementById('f-phone').value},
+    '電子信箱':{email:document.getElementById('f-email').value},
+    '備註':{rich_text:[{text:{content:document.getElementById('f-note').value}}]},
+    '借用狀態':{select:{name:'待審核'}}
+  };
+  try {
+    const res=await fetch(`${WORKER}/v1/pages`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.token},
+      body:JSON.stringify({parent:{database_id:LOANS_DB.replace(/-/g,'')},properties:props})
+    });
+    if(!res.ok){ const d=await res.json(); throw new Error(d.message||'HTTP '+res.status); }
+    const unit=document.getElementById('f-unit').value;
+    const name=document.getElementById('f-name').value;
+    let detail=keys.map(idx=>{const{card,qty}=selectedMap[idx];return`<div class="success-row"><span>${card.dataset.name}</span><span>×${qty}</span></div>`;}).join('');
+    detail+=`<div class="success-row" style="border-top:0.5px solid var(--green-mid);margin-top:6px;padding-top:6px;"><span>借用單位</span><span>${unit}</span></div>`;
+    detail+=`<div class="success-row"><span>借用人</span><span>${name}</span></div>`;
+    detail+=`<div class="success-row"><span>領取時間</span><span>${pickup.replace('T',' ')}</span></div>`;
+    detail+=`<div class="success-row"><span>歸還時間</span><span>${ret.replace('T',' ')}</span></div>`;
+    document.getElementById('success-detail').innerHTML=detail;
+    document.getElementById('step2').style.display='none';
+    document.getElementById('step3').style.display='block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  } catch(e){
+    errEl.innerHTML='<strong>送出失敗：</strong>'+e.message;
+    errEl.classList.add('show');
+  } finally {
+    btn.disabled=false; btn.innerHTML='<i class="ti ti-send"></i>送出借用申請';
+  }
 }
+
+function resetAll(){
+  Object.values(selectedMap).forEach(({card})=>card.classList.remove('selected'));
+  selectedMap={};
+  document.querySelectorAll('.qty-num').forEach(n=>n.textContent='1');
+  ['f-pickup','f-return','f-unit','f-name','f-role','f-phone','f-email','f-note'].forEach(id=>document.getElementById(id).value='');
+  updateCart();
+  document.getElementById('step3').style.display='none';
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step1').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
 function showPage(p,btn){
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(x=>x.classList.remove('active'));
