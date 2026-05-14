@@ -36,13 +36,13 @@
   .item-card:hover:not(.soldout){border-color:var(--border-strong);}
   .item-card.selected{border:1.5px solid var(--blue);}
   .item-card.soldout{opacity:0.5;cursor:not-allowed;}
-  .item-img{width:100%;height:140px;object-fit:cover;display:block;background:var(--bg-secondary);}
-  .item-img-placeholder{width:100%;height:140px;background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;color:var(--text-hint);font-size:36px;}
-  .item-img-overlay{position:absolute;top:0;left:0;right:0;height:140px;background:rgba(24,95,165,0.08);opacity:0;transition:opacity 0.15s;}
+  .item-img{width:100%;height:160px;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:var(--bg-secondary);display:block;}
+  .item-img-placeholder{width:100%;height:160px;background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;color:var(--text-hint);font-size:36px;}
+  .item-img-overlay{position:absolute;top:0;left:0;right:0;height:160px;background:rgba(24,95,165,0.08);opacity:0;transition:opacity 0.15s;}
   .item-card.selected .item-img-overlay{opacity:1;}
   .check-badge{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;display:none;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
   .item-card.selected .check-badge{display:flex;}
-  .soldout-overlay{position:absolute;top:0;left:0;right:0;height:140px;background:rgba(0,0,0,0.35);display:none;align-items:center;justify-content:center;}
+  .soldout-overlay{position:absolute;top:0;left:0;right:0;height:160px;background:rgba(0,0,0,0.35);display:none;align-items:center;justify-content:center;}
   .item-card.soldout .soldout-overlay{display:flex;}
   .soldout-label{background:rgba(0,0,0,0.7);color:#fff;font-size:12px;font-weight:500;padding:4px 12px;border-radius:99px;}
   .item-body{padding:12px 14px 14px;}
@@ -298,8 +298,7 @@ function renderGrid(){
     const txt = avail<=0?'全數借出':'可借 '+avail+' 件';
 
     const imgHtml = item.img
-      ? `<img class="item-img" src="${IMAGES_BASE}${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-         <div class="item-img-placeholder" style="display:none;"><i class="ti ti-package"></i></div>`
+      ? `<div class="item-img" style="background-image:url('${IMAGES_BASE}${encodeURIComponent(item.img)}')"></div>`
       : `<div class="item-img-placeholder"><i class="ti ti-package"></i></div>`;
 
     const c = document.createElement('div');
