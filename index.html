@@ -36,7 +36,8 @@
   .item-card:hover:not(.soldout){border-color:var(--border-strong);}
   .item-card.selected{border:1.5px solid var(--blue);}
   .item-card.soldout{opacity:0.5;cursor:not-allowed;}
-  .item-img{width:100%;height:200px;background-size:contain;background-position:center;background-repeat:no-repeat;background-color:var(--bg-secondary);display:block;}
+  .item-img-wrap{width:100%;height:200px;background:var(--bg-secondary);overflow:hidden;display:flex;align-items:center;justify-content:center;}
+  .item-img{width:100%;height:200px;object-fit:contain;object-position:center;display:block;background:var(--bg-secondary);}
   .item-img-placeholder{width:100%;height:200px;background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;color:var(--text-hint);font-size:36px;}
   .item-img-overlay{position:absolute;top:0;left:0;right:0;height:200px;background:rgba(24,95,165,0.08);opacity:0;transition:opacity 0.15s;}
   .item-card.selected .item-img-overlay{opacity:1;}
@@ -298,7 +299,7 @@ function renderGrid(){
     const txt = avail<=0?'全數借出':'可借 '+avail+' 件';
 
     const imgHtml = item.img
-      ? `<div class="item-img" style="background-image:url('${IMAGES_BASE}${encodeURIComponent(item.img)}')"></div>`
+      ? `<div class="item-img-wrap"><img class="item-img" src="${IMAGES_BASE}${encodeURIComponent(item.img)}" alt="${item.name}" onerror="this.closest('.item-img-wrap').innerHTML='<div class=\\'item-img-placeholder\\'><i class=\\'ti ti-package\\'></i></div>'"></div>`
       : `<div class="item-img-placeholder"><i class="ti ti-package"></i></div>`;
 
     const c = document.createElement('div');
