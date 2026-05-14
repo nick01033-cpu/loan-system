@@ -17,7 +17,7 @@
   .nav-tab{padding:6px 16px;font-size:13px;border-radius:var(--radius);border:0.5px solid transparent;cursor:pointer;color:var(--text-secondary);background:transparent;transition:all 0.15s;font-family:inherit;}
   .nav-tab.active{background:var(--bg-secondary);border-color:var(--border);color:var(--text);font-weight:500;}
   .nav-tab:hover:not(.active){background:var(--bg-secondary);}
-  .container{max-width:860px;margin:0 auto;padding:28px 20px;}
+  .container{max-width:900px;margin:0 auto;padding:28px 20px;}
   .page{display:none;}.page.active{display:block;}
   .steps-bar{display:flex;align-items:center;margin-bottom:28px;}
   .step-item{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text-secondary);}
@@ -29,14 +29,24 @@
   .step-line{flex:1;height:0.5px;background:var(--border);margin:0 10px;}
   .section-title{font-size:18px;font-weight:600;color:var(--text);margin-bottom:4px;}
   .section-sub{font-size:13px;color:var(--text-secondary);margin-bottom:20px;}
-  .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
-  .item-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:border-color 0.15s;position:relative;user-select:none;}
+
+  /* 物品卡片（含圖片版） */
+  .items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:20px;}
+  .item-card{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;transition:border-color 0.15s;position:relative;user-select:none;overflow:hidden;}
   .item-card:hover:not(.soldout){border-color:var(--border-strong);}
-  .item-card.selected{border:1.5px solid var(--blue);background:var(--blue-light);}
+  .item-card.selected{border:1.5px solid var(--blue);}
   .item-card.soldout{opacity:0.5;cursor:not-allowed;}
-  .check-badge{position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;display:none;align-items:center;justify-content:center;}
+  .item-img{width:100%;height:140px;object-fit:cover;display:block;background:var(--bg-secondary);}
+  .item-img-placeholder{width:100%;height:140px;background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;color:var(--text-hint);font-size:36px;}
+  .item-img-overlay{position:absolute;top:0;left:0;right:0;height:140px;background:rgba(24,95,165,0.08);opacity:0;transition:opacity 0.15s;}
+  .item-card.selected .item-img-overlay{opacity:1;}
+  .check-badge{position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12px;display:none;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);}
   .item-card.selected .check-badge{display:flex;}
-  .loc-tag{font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:3px;margin-bottom:5px;}
+  .soldout-overlay{position:absolute;top:0;left:0;right:0;height:140px;background:rgba(0,0,0,0.35);display:none;align-items:center;justify-content:center;}
+  .item-card.soldout .soldout-overlay{display:flex;}
+  .soldout-label{background:rgba(0,0,0,0.7);color:#fff;font-size:12px;font-weight:500;padding:4px 12px;border-radius:99px;}
+  .item-body{padding:12px 14px 14px;}
+  .loc-tag{font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:3px;margin-bottom:4px;}
   .item-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;}
   .item-spec{font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5;min-height:16px;}
   .item-footer{display:flex;align-items:center;justify-content:space-between;min-height:26px;}
@@ -47,9 +57,10 @@
   .qty-ctrl{display:none;align-items:center;gap:7px;}
   .item-card.selected .qty-ctrl{display:flex;}
   .item-card.selected .avail-badge{display:none;}
-  .qty-btn{width:24px;height:24px;border-radius:50%;border:0.5px solid var(--blue-mid);background:var(--blue-light);color:var(--blue);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;}
+  .qty-btn{width:26px;height:26px;border-radius:50%;border:0.5px solid var(--blue-mid);background:var(--blue-light);color:var(--blue);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;}
   .qty-btn:hover{background:var(--blue-mid);}
   .qty-num{font-size:14px;font-weight:600;color:var(--blue);min-width:18px;text-align:center;}
+
   .cart-bar{background:var(--bg-secondary);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:20px;}
   .cart-bar-title{font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
   .cart-chips{display:flex;flex-wrap:wrap;gap:7px;}
@@ -152,13 +163,11 @@
 
 <!-- 管理後台 -->
 <div class="page" id="page-admin">
-
-  <!-- Notion 設定 -->
   <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:24px;margin-bottom:16px;">
     <div style="font-size:15px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
       <i class="ti ti-plug" style="color:var(--blue)"></i>Notion 連線設定
     </div>
-    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;">設定後系統會自動從 Notion 讀取物品清單</div>
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;">設定後系統會自動從 Notion 讀取物品清單與圖片</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
       <div>
         <div style="font-size:12px;font-weight:500;color:var(--text-secondary);">Integration Token</div>
@@ -177,12 +186,23 @@
     </div>
   </div>
 
-  <!-- Notion 快捷連結 -->
+  <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:16px;">
+    <div style="font-size:14px;font-weight:500;margin-bottom:6px;display:flex;align-items:center;gap:7px;">
+      <i class="ti ti-photo" style="color:var(--blue)"></i>圖片設定說明
+    </div>
+    <div style="font-size:12px;color:var(--text-secondary);line-height:1.8;">
+      1. 在 GitHub repository 建立 <code style="background:var(--bg-secondary);padding:1px 5px;border-radius:3px;">images/</code> 資料夾，上傳物品圖片<br>
+      2. 在 Notion「物品清單」新增欄位：名稱 <code style="background:var(--bg-secondary);padding:1px 5px;border-radius:3px;">圖片檔名</code>，類型 <strong>Text</strong><br>
+      3. 每項物品填入圖片檔名，例如 <code style="background:var(--bg-secondary);padding:1px 5px;border-radius:3px;">chair.jpg</code>、<code style="background:var(--bg-secondary);padding:1px 5px;border-radius:3px;">table.jpg</code><br>
+      4. 沒有填圖片檔名的物品會顯示預設圖示
+    </div>
+  </div>
+
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
     <a class="admin-card" href="https://www.notion.so/3607b4b0cbb7808db422e536da1f6fad" target="_blank">
       <div style="font-size:20px;color:var(--blue);margin-bottom:8px;"><i class="ti ti-package"></i></div>
       <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;">物品清單</div>
-      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">新增、編輯物品資料與庫存數量</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px;">新增、編輯物品資料與圖片檔名</div>
       <div style="font-size:12px;color:var(--blue);display:flex;align-items:center;gap:4px;">開啟 Notion <i class="ti ti-external-link" style="font-size:12px"></i></div>
     </a>
     <a class="admin-card" href="https://www.notion.so/3607b4b0cbb78044bff4e2f5abae1900?v=3607b4b0cbb780af9ef9000c6ef07912" target="_blank">
@@ -195,7 +215,7 @@
 
   <div style="background:var(--amber-light);border:0.5px solid var(--amber-mid);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--amber);display:flex;gap:7px;align-items:flex-start;line-height:1.6;">
     <i class="ti ti-bulb" style="font-size:14px;flex-shrink:0;margin-top:1px"></i>
-    <div>在 Notion「物品清單」更新資料後，回到這裡點「儲存並讀取」即可刷新前台顯示。借用申請記錄會直接出現在「借用記錄」資料庫。</div>
+    <div>在 Notion 更新資料後，回到這裡點「儲存並讀取」即可刷新前台顯示。</div>
   </div>
 </div>
 
@@ -203,6 +223,7 @@
 
 <script>
 const WORKER = 'https://notion-proxy.nick01033.workers.dev';
+const IMAGES_BASE = 'https://nick01033-cpu.github.io/loan-system/images/';
 const FORM_URL = 'https://www.notion.so/3607b4b0cbb78044bff4e2f5abae1900?v=3607b4b0cbb780af9ef9000c6ef07912&source=copy_link';
 
 let ITEMS = [], selectedMap = {};
@@ -238,7 +259,7 @@ async function loadItems(token, dbId){
       },
       body: JSON.stringify({ page_size: 100 })
     });
-    if(!res.ok) throw new Error('HTTP ' + res.status + '，請確認 Token 和 Database ID 是否正確，以及資料庫是否已加入 Integration');
+    if(!res.ok) throw new Error('HTTP ' + res.status + '，請確認 Token 和 Database ID 是否正確');
     const data = await res.json();
     if(data.object === 'error') throw new Error(data.message);
     ITEMS = (data.results||[]).map(p => {
@@ -249,7 +270,8 @@ async function loadItems(token, dbId){
         spec: getT(pr['規格說明']),
         total: getN(pr['總數量']),
         loaned: getN(pr['外借中數量']),
-        loc: getS(pr['存放位置'])
+        loc: getS(pr['存放位置']),
+        img: getT(pr['圖片檔名'])
       };
     }).filter(i => i.name);
     if(!ITEMS.length) throw new Error('物品清單沒有資料，請先在 Notion 新增物品');
@@ -257,7 +279,6 @@ async function loadItems(token, dbId){
   } catch(e) {
     errEl.innerHTML = '<strong>讀取失敗：</strong>' + e.message;
     errEl.classList.add('show');
-    document.getElementById('items-grid').innerHTML = '';
   } finally {
     loadEl.classList.remove('show');
   }
@@ -270,25 +291,37 @@ function getS(p){ return p?.select?.name||''; }
 function renderGrid(){
   const g = document.getElementById('items-grid');
   g.innerHTML = '';
-  ITEMS.forEach((item,idx) => {
+  ITEMS.forEach((item, idx) => {
     const avail = item.total - item.loaned;
     const soldout = avail <= 0;
     const cls = avail<=0?'av-no':avail<=2?'av-low':'av-ok';
     const txt = avail<=0?'全數借出':'可借 '+avail+' 件';
+
+    const imgHtml = item.img
+      ? `<img class="item-img" src="${IMAGES_BASE}${item.img}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+         <div class="item-img-placeholder" style="display:none;"><i class="ti ti-package"></i></div>`
+      : `<div class="item-img-placeholder"><i class="ti ti-package"></i></div>`;
+
     const c = document.createElement('div');
-    c.className = 'item-card'+(soldout?' soldout':'');
+    c.className = 'item-card' + (soldout?' soldout':'');
     c.dataset.idx = idx; c.dataset.name = item.name; c.dataset.max = avail;
     c.onclick = () => soldout ? alert('此物品目前全數借出') : toggleItem(c);
-    c.innerHTML = `<div class="check-badge"><i class="ti ti-check" style="font-size:10px"></i></div>
-      ${item.loc?`<div class="loc-tag"><i class="ti ti-map-pin" style="font-size:11px"></i>${item.loc}</div>`:''}
-      <div class="item-name">${item.name}</div>
-      <div class="item-spec">${item.spec||''}</div>
-      <div class="item-footer">
-        <span class="avail-badge ${cls}">${txt}</span>
-        <div class="qty-ctrl">
-          <button class="qty-btn" onclick="chgQty(event,this,-1)">−</button>
-          <span class="qty-num">1</span>
-          <button class="qty-btn" onclick="chgQty(event,this,1)">＋</button>
+    c.innerHTML = `
+      ${imgHtml}
+      <div class="item-img-overlay"></div>
+      <div class="check-badge"><i class="ti ti-check" style="font-size:11px"></i></div>
+      <div class="soldout-overlay"><span class="soldout-label">全數借出</span></div>
+      <div class="item-body">
+        ${item.loc?`<div class="loc-tag"><i class="ti ti-map-pin" style="font-size:11px"></i>${item.loc}</div>`:''}
+        <div class="item-name">${item.name}</div>
+        <div class="item-spec">${item.spec||''}</div>
+        <div class="item-footer">
+          <span class="avail-badge ${cls}">${txt}</span>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="chgQty(event,this,-1)">−</button>
+            <span class="qty-num">1</span>
+            <button class="qty-btn" onclick="chgQty(event,this,1)">＋</button>
+          </div>
         </div>
       </div>`;
     g.appendChild(c);
