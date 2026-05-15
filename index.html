@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>中山附醫達文西微創手術中心物品借用申請</title>
+<title>中山附醫達文西微創手術中心物品借用申請系統</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/dist/tabler-icons.min.css">
 <style>
   :root{--blue:#185FA5;--blue-light:#E6F1FB;--blue-mid:#B5D4F4;--blue-dark:#0C447C;--green:#3B6D11;--green-light:#EAF3DE;--green-mid:#C0DD97;--amber:#854F0B;--amber-light:#FAEEDA;--amber-mid:#FAC775;--red:#A32D2D;--red-light:#FCEBEB;--text:#1a1a18;--text-secondary:#6b6a65;--text-hint:#9c9a92;--bg:#ffffff;--bg-secondary:#f5f4f0;--bg-tertiary:#efede8;--border:rgba(0,0,0,0.12);--border-strong:rgba(0,0,0,0.22);--radius:8px;--radius-lg:12px;}
@@ -118,7 +118,7 @@
 <body>
 
 <nav class="nav">
-  <div class="nav-title"><i class="ti ti-package"></i>中山附醫達文西微創手術中心物品借用申請</div>
+  <div class="nav-title"><i class="ti ti-package"></i>中山附醫達文西微創手術中心物品借用申請系統</div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showPage('borrow',this)"><i class="ti ti-clipboard-list"></i> 借用申請</button>
     <button class="nav-tab" onclick="showPage('admin',this)"><i class="ti ti-settings"></i> 管理後台</button>
@@ -258,34 +258,52 @@ window.onload = function(){
 function loadConfig(){ try{ return JSON.parse(localStorage.getItem('notionCfg')||'{}'); }catch(e){ return {}; } }
 
 async function initData(token, dbId){
-  document.getElementById('load-items').classList.add('show');
-  try {
-    await Promise.all([loadItems(token, dbId), loadLoans(token)]);
-  } finally {
-    document.getElementById('load-items').classList.remove('show');
+  const loadEl = document.getElementById('load-items');
+  const errEl = document.getElementById('err-items');
+  errEl.classList.remove('show');
+  loadEl.classList.add('show');
+  loadEl.innerHTML = '<div class="spinner"></div>正在讀取物品資料...';
+
+  let success = false;
+  for(let attempt = 1; attempt <= 3; attempt++){
+    try {
+      if(attempt > 1){
+        loadEl.innerHTML = '<div class="spinner"></div>第 '+attempt+' 次嘗試讀取...';
+        await new Promise(r => setTimeout(r, 1000 * attempt));
+      }
+      await Promise.all([loadItems(token, dbId), loadLoans(token)]);
+      success = true;
+      break;
+    } catch(e){
+      if(attempt === 3){
+        errEl.innerHTML = '<strong>讀取失敗</strong>，請點下方按鈕重新載入，或重新整理頁面。<br><br><button onclick="retryLoad()" style="padding:8px 16px;font-size:13px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;">重新載入</button>';
+        errEl.classList.add('show');
+      }
+    }
   }
+  loadEl.classList.remove('show');
+  loadEl.innerHTML = '<div class="spinner"></div>正在讀取物品資料...';
+}
+
+function retryLoad(){
+  const cfg = loadConfig();
+  if(cfg.token) initData(cfg.token, cfg.db || ITEMS_DB);
 }
 
 async function loadItems(token, dbId){
-  const errEl = document.getElementById('err-items');
-  try {
-    const res = await fetch(`${WORKER}/v1/databases/${dbId.replace(/-/g,'')}/query`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-      body:JSON.stringify({page_size:100})
-    });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    if(data.object==='error') throw new Error(data.message);
-    ITEMS = (data.results||[]).map(p=>{
-      const pr=p.properties||{};
-      return { id:p.id, name:getT(pr['物品名稱']), spec:getT(pr['規格說明']), total:getN(pr['總數量']), loaned:getN(pr['外借中數量']), loc:getS(pr['存放位置']), img:getT(pr['圖片檔名']) };
-    }).filter(i=>i.name);
-    if(!ITEMS.length) throw new Error('物品清單沒有資料');
-  } catch(e){
-    errEl.innerHTML='<strong>讀取失敗：</strong>'+e.message;
-    errEl.classList.add('show');
-  }
+  const res = await fetch(`${WORKER}/v1/databases/${dbId.replace(/-/g,'')}/query`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify({page_size:100})
+  });
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const data = await res.json();
+  if(data.object==='error') throw new Error(data.message);
+  ITEMS = (data.results||[]).map(p=>{
+    const pr=p.properties||{};
+    return { id:p.id, name:getT(pr['物品名稱']), spec:getT(pr['規格說明']), total:getN(pr['總數量']), loaned:getN(pr['外借中數量']), loc:getS(pr['存放位置']), img:getT(pr['圖片檔名']) };
+  }).filter(i=>i.name);
+  if(!ITEMS.length) throw new Error('物品清單沒有資料');
 }
 
 async function loadLoans(token){
