@@ -264,19 +264,24 @@ async function initData(token, dbId){
   loadEl.classList.add('show');
   loadEl.innerHTML = '<div class="spinner"></div>正在讀取物品資料...';
 
+  // 先暖機 Worker（避免冷啟動失敗）
+  try { await fetch(WORKER + '/ping'); } catch(e){}
+
   let success = false;
-  for(let attempt = 1; attempt <= 3; attempt++){
+  for(let attempt = 1; attempt <= 5; attempt++){
     try {
       if(attempt > 1){
         loadEl.innerHTML = '<div class="spinner"></div>第 '+attempt+' 次嘗試讀取...';
-        await new Promise(r => setTimeout(r, 1000 * attempt));
+        await new Promise(r => setTimeout(r, 1500));
       }
-      await Promise.all([loadItems(token, dbId), loadLoans(token)]);
+      await loadItems(token, dbId);
+      loadLoans(token); // 借用記錄在背景讀取，不阻塞主流程
       success = true;
       break;
     } catch(e){
-      if(attempt === 3){
-        errEl.innerHTML = '<strong>讀取失敗</strong>，請點下方按鈕重新載入，或重新整理頁面。<br><br><button onclick="retryLoad()" style="padding:8px 16px;font-size:13px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;">重新載入</button>';
+      console.warn('第'+attempt+'次讀取失敗：', e.message);
+      if(attempt === 5){
+        errEl.innerHTML = '<strong>讀取失敗</strong>，請點下方按鈕重新載入。<br><br><button onclick="retryLoad()" style="padding:8px 16px;font-size:13px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-family:inherit;"><i class=\'ti ti-refresh\'></i> 重新載入</button>';
         errEl.classList.add('show');
       }
     }
@@ -291,19 +296,30 @@ function retryLoad(){
 }
 
 async function loadItems(token, dbId){
-  const res = await fetch(`${WORKER}/v1/databases/${dbId.replace(/-/g,'')}/query`,{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-    body:JSON.stringify({page_size:100})
-  });
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  const data = await res.json();
-  if(data.object==='error') throw new Error(data.message);
-  ITEMS = (data.results||[]).map(p=>{
-    const pr=p.properties||{};
-    return { id:p.id, name:getT(pr['物品名稱']), spec:getT(pr['規格說明']), total:getN(pr['總數量']), loaned:getN(pr['外借中數量']), loc:getS(pr['存放位置']), img:getT(pr['圖片檔名']) };
-  }).filter(i=>i.name);
-  if(!ITEMS.length) throw new Error('物品清單沒有資料');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000); // 10秒 timeout
+  try {
+    const res = await fetch(`${WORKER}/v1/databases/${dbId.replace(/-/g,'')}/query`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({page_size:100}),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if(data.object==='error') throw new Error(data.message);
+    const results = data.results||[];
+    if(!results.length) throw new Error('暫時無資料，重試中');
+    ITEMS = results.map(p=>{
+      const pr=p.properties||{};
+      return { id:p.id, name:getT(pr['物品名稱']), spec:getT(pr['規格說明']), total:getN(pr['總數量']), loaned:getN(pr['外借中數量']), loc:getS(pr['存放位置']), img:getT(pr['圖片檔名']) };
+    }).filter(i=>i.name);
+    renderGrid();
+  } catch(e){
+    clearTimeout(timeout);
+    throw e;
+  }
 }
 
 async function loadLoans(token){
