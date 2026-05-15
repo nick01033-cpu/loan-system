@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>中山附醫達文西微創手術中心物品借用系統</title>
+<title>中山附醫達文西微創手術中心物品借用申請</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/dist/tabler-icons.min.css">
 <style>
   :root{--blue:#185FA5;--blue-light:#E6F1FB;--blue-mid:#B5D4F4;--blue-dark:#0C447C;--green:#3B6D11;--green-light:#EAF3DE;--green-mid:#C0DD97;--amber:#854F0B;--amber-light:#FAEEDA;--amber-mid:#FAC775;--red:#A32D2D;--red-light:#FCEBEB;--text:#1a1a18;--text-secondary:#6b6a65;--text-hint:#9c9a92;--bg:#ffffff;--bg-secondary:#f5f4f0;--bg-tertiary:#efede8;--border:rgba(0,0,0,0.12);--border-strong:rgba(0,0,0,0.22);--radius:8px;--radius-lg:12px;}
@@ -118,7 +118,7 @@
 <body>
 
 <nav class="nav">
-  <div class="nav-title"><i class="ti ti-package"></i>中山附醫達文西微創手術中心物品借用系統</div>
+  <div class="nav-title"><i class="ti ti-package"></i>中山附醫達文西微創手術中心物品借用申請</div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showPage('borrow',this)"><i class="ti ti-clipboard-list"></i> 借用申請</button>
     <button class="nav-tab" onclick="showPage('admin',this)"><i class="ti ti-settings"></i> 管理後台</button>
@@ -321,7 +321,10 @@ function getBookedPeriods(itemName){
   return LOANS.filter(l => l.items.includes(itemName)).map(l=>{
     const p = fmtDate(l.pickup);
     const r = fmtDate(l.ret);
-    return `${p} － ${r}`;
+    const match = l.items.split('\n').find(line => line.includes(itemName));
+    const qtyMatch = match ? match.match(/×(\d+)/) : null;
+    const qty = qtyMatch ? qtyMatch[1] : '?';
+    return `${p} － ${r}　已借 ${qty} 件`;
   });
 }
 
